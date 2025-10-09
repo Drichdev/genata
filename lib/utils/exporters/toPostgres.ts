@@ -1,6 +1,8 @@
 type PGType = "VARCHAR(255)" | "INTEGER" | "NUMERIC(10,2)" | "BOOLEAN" | "DATE" | "TIMESTAMP" | "UUID";
 
-const inferPgType = (val: any): PGType => {
+type Value = string | number | boolean | null | undefined;
+
+const inferPgType = (val: Value): PGType => {
   if (val === null || val === undefined || val === "") return "VARCHAR(255)";
   if (val === true || val === false || val === "true" || val === "false") return "BOOLEAN";
   if (typeof val === "number" && Number.isInteger(val)) return "INTEGER";
@@ -13,7 +15,7 @@ const inferPgType = (val: any): PGType => {
   return "VARCHAR(255)";
 };
 
-const pgEscape = (val: any): string => {
+const pgEscape = (val: Value): string => {
   if (val === null || val === undefined) return "NULL";
   if (typeof val === "boolean") return val ? "TRUE" : "FALSE";
   if (typeof val === "number") return String(val);
@@ -22,13 +24,13 @@ const pgEscape = (val: any): string => {
   return `'${s}'`;
 };
 
-export const exportToPostgres = (data: any[], tableName = "mock_data"): string => {
+export const exportToPostgres = (data: Record<string, string>[], tableName = "mock_data"): string => {
   if (!data || data.length === 0) return "-- No data";
   const columns = Object.keys(data[0] || {});
 
   const colTypes: Record<string, PGType> = {};
   for (const col of columns) {
-    let sample: any = "";
+    let sample: Value = "";
     for (const row of data) {
       if (row[col] !== undefined && row[col] !== "") { sample = row[col]; break; }
     }

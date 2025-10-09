@@ -1,6 +1,7 @@
 type SQLType = "VARCHAR(255)" | "INT" | "DECIMAL(10,2)" | "BOOLEAN" | "DATE" | "DATETIME" | "CHAR(36)";
+type Value = string | number | boolean | null | undefined;
 
-const inferSqlType = (val: any): SQLType => {
+const inferSqlType = (val: Value): SQLType => {
   if (val === null || val === undefined || val === "") return "VARCHAR(255)";
   // boolean
   if (val === true || val === false || val === "true" || val === "false") return "BOOLEAN";
@@ -19,7 +20,7 @@ const inferSqlType = (val: any): SQLType => {
   return "VARCHAR(255)";
 };
 
-const sqlEscape = (val: any): string => {
+const sqlEscape = (val: Value): string => {
   if (val === null || val === undefined) return "NULL";
   if (typeof val === "boolean") return val ? "TRUE" : "FALSE";
   // keep numbers as-is
@@ -29,14 +30,14 @@ const sqlEscape = (val: any): string => {
   return `'${s}'`;
 };
 
-export const exportToSQL = (data: any[], tableName = "mock_data"): string => {
+export const exportToSQL = (data: Record<string, string>[], tableName = "mock_data"): string => {
   if (!data || data.length === 0) return "-- No data";
   const columns = Object.keys(data[0] || {});
 
   // infer column types from first non-empty value per column
   const colTypes: Record<string, SQLType> = {};
   for (const col of columns) {
-    let sample: any = "";
+    let sample: Value = "";
     for (const row of data) {
       if (row[col] !== undefined && row[col] !== "") { sample = row[col]; break; }
     }

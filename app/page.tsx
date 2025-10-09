@@ -61,13 +61,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+type ExportType = "csv" | "json" | "sql" | "postgres";
+
 interface Field {
   name: string;
   type: FieldType;
 }
 
 const fieldOptions: { label: string; value: FieldType }[] =
-  supportedTypes as any;
+  (supportedTypes as unknown as { label: string; value: FieldType }[]);
 
 export default function HomePage() {
   const [fields, setFields] = useState<Field[]>([
@@ -75,12 +77,10 @@ export default function HomePage() {
     { name: "nom", type: "last_name" },
     { name: "prenom", type: "first_name" },
   ]);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, string>[]>([]);
   const [loadingCols, setLoadingCols] = useState<number[]>([]); // cols en chargement
   const [count, setCount] = useState(50);
-  const [exportType, setExportType] = useState<
-    "csv" | "json" | "sql" | "postgres"
-  >("csv");
+  const [exportType, setExportType] = useState<ExportType>("csv");
 
   // Génère un nom unique de colonne
   const getUniqueName = (base: string = "col"): string => {
@@ -282,7 +282,7 @@ export default function HomePage() {
           </div>
 
           <div className="w-full sm:w-48">
-            <Select>
+            <Select value={exportType} onValueChange={(v) => setExportType(v as ExportType)}>
               <SelectTrigger className="w-full border rounded px-3 py-2">
               <SelectValue placeholder="Format" />
               </SelectTrigger>
