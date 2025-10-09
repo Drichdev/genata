@@ -328,7 +328,7 @@ export default function HomePage() {
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
           >
             <RefreshCcw className="w-4 h-4 inline mr-1" />
-            Générer tout
+            Générer un visuel
           </Button>
         </div>
       </section>
